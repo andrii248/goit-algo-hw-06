@@ -1,48 +1,116 @@
+import matplotlib.pyplot as plt
 import networkx as nx
+from collections import deque
 
-# Create the graph (imported from the first task)
-graph = nx.Graph()
 
-# Add nodes (cities)
-cities = ["New York", "Chicago", "Houston", "Miami", "Boston"]
-graph.add_nodes_from(cities)
+# Функція для візуалізації графа з кольоровими ребрами
+def draw_graph_step(graph, pos, visited_edges):
+    plt.figure()
+    G = nx.Graph(graph)
+    nx.draw(
+        G,
+        pos,
+        with_labels=True,
+        node_color="lightblue",
+        node_size=700,
+        font_size=12,
+        font_weight="bold",
+    )
 
-# Add edges (transport connections)
-connections = [
-    ("New York", "Boston", 215),
-    ("New York", "Chicago", 790),
-    ("Chicago", "Houston", 940),
-    ("Houston", "Miami", 1180),
-    ("Miami", "New York", 1280),
-    ("Boston", "Chicago", 980),
-    ("Miami", "Chicago", 1380),
-    ("New York", "Houston", 1620),
-]
+    red_edges = visited_edges
+    blue_edges = [
+        (u, v)
+        for u in graph
+        for v in graph[u]
+        if (u, v) not in visited_edges and (v, u) not in visited_edges
+    ]
 
-# Add edges with weights (distance in miles)
-for city1, city2, distance in connections:
-    graph.add_edge(city1, city2, weight=distance)
+    nx.draw_networkx_edges(G, pos, edgelist=red_edges, edge_color="red", width=2)
+    nx.draw_networkx_edges(
+        G, pos, edgelist=blue_edges, edge_color="blue", width=2, style="dashed"
+    )
 
-# Perform DFS and BFS
-start_city = "New York"
+    plt.show()
 
-# Depth-First Search (DFS)
+
+# Реалізація DFS з візуалізацією
+def dfs_recursive_visual(graph, vertex, visited=None, visited_edges=None, pos=None):
+    if visited is None:
+        visited = set()
+    if visited_edges is None:
+        visited_edges = []
+    if pos is None:
+        pos = nx.spring_layout(nx.Graph(graph))  # Layout для графа
+
+    visited.add(vertex)
+    print(vertex, end=" ")  # Відвідуємо вершину
+
+    for neighbor in graph[vertex]:
+        if neighbor not in visited:
+            visited_edges.append((vertex, neighbor))
+            draw_graph_step(graph, pos, visited_edges)  # Візуалізація на кожному кроці
+            dfs_recursive_visual(graph, neighbor, visited, visited_edges, pos)
+
+
+# Реалізація BFS (рекурсивно) з візуалізацією
+def bfs_recursive_visual(graph, queue, visited=None, visited_edges=None, pos=None):
+    if visited is None:
+        visited = set()
+    if visited_edges is None:
+        visited_edges = []
+    if pos is None:
+        pos = nx.spring_layout(nx.Graph(graph))  # Layout для графа
+
+    if not queue:
+        return
+
+    vertex = queue.popleft()
+    if vertex not in visited:
+        print(vertex, end=" ")  # Відвідуємо вершину
+        visited.add(vertex)
+
+        for neighbor in graph[vertex]:
+            if neighbor not in visited:
+                visited_edges.append((vertex, neighbor))
+                queue.append(neighbor)
+        draw_graph_step(graph, pos, visited_edges)  # Візуалізація на кожному кроці
+
+    bfs_recursive_visual(graph, queue, visited, visited_edges, pos)
+
+
+# Створення графа (на основі першого прикладу)
+graph_data = {
+    "New York": ["Boston", "Chicago", "Houston", "Miami"],
+    "Boston": ["New York", "Chicago"],
+    "Chicago": ["New York", "Boston", "Houston", "Miami"],
+    "Houston": ["New York", "Chicago", "Miami"],
+    "Miami": ["New York", "Houston", "Chicago"],
+}
+
+# Перетворення у формат для networkx
+G = nx.Graph()
+for node, neighbors in graph_data.items():
+    for neighbor in neighbors:
+        G.add_edge(node, neighbor)
+
+# Візуалізація графа
+pos = nx.spring_layout(G)
+nx.draw(
+    G,
+    pos,
+    with_labels=True,
+    node_color="lightblue",
+    node_size=700,
+    font_size=12,
+    font_weight="bold",
+)
+plt.title("Graph Visualization")
+plt.show()
+
+# Виконання DFS
 print("DFS Path:")
-dfs_path = list(nx.dfs_edges(graph, source=start_city))
-for edge in dfs_path:
-    print(f"{edge[0]} -> {edge[1]}")
+dfs_recursive_visual(graph_data, "New York")
 
-# Breadth-First Search (BFS)
-print("\nBFS Path:")
-bfs_path = list(nx.bfs_edges(graph, source=start_city))
-for edge in bfs_path:
-    print(f"{edge[0]} -> {edge[1]}")
-
-# Explanation of differences
-print("\nExplanation:")
-print(
-    "DFS explores as far as possible along each branch before backtracking. This results in a path that can go deep into the graph before exploring other branches."
-)
-print(
-    "BFS explores all neighbors at the current depth before moving deeper, resulting in a level-by-level exploration of the graph."
-)
+# Виконання BFS
+print("\n\nBFS Path:")
+bfs_recursive_visual(graph_data, deque(["New York"]))

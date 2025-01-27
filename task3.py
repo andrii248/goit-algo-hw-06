@@ -1,39 +1,49 @@
-import networkx as nx
+def dijkstra(graph, start):
+    # Initialize distances and the set of unvisited vertices
+    distances = {vertex: float("infinity") for vertex in graph}
+    distances[start] = 0
+    unvisited = list(graph.keys())
 
-# Create the graph (imported from the first task)
-graph = nx.Graph()
+    while unvisited:
+        # Find the vertex with the smallest distance among unvisited vertices
+        current_vertex = min(unvisited, key=lambda vertex: distances[vertex])
 
-# Add nodes (cities)
-cities = ["New York", "Chicago", "Houston", "Miami", "Boston"]
-graph.add_nodes_from(cities)
+        # If the smallest distance is infinity, we are done
+        if distances[current_vertex] == float("infinity"):
+            break
 
-# Add edges (transport connections)
-connections = [
-    ("New York", "Boston", 215),
-    ("New York", "Chicago", 790),
-    ("Chicago", "Houston", 940),
-    ("Houston", "Miami", 1180),
-    ("Miami", "New York", 1280),
-    ("Boston", "Chicago", 980),
-    ("Miami", "Chicago", 1380),
-    ("New York", "Houston", 1620),
-]
+        for neighbor, weight in graph[current_vertex].items():
+            distance = distances[current_vertex] + weight
 
-# Add edges with weights (distance in miles)
-for city1, city2, distance in connections:
-    graph.add_edge(city1, city2, weight=distance)
+            # Update the shortest path if the new distance is shorter
+            if distance < distances[neighbor]:
+                distances[neighbor] = distance
 
-# Implement Dijkstra's algorithm to find shortest paths
-print("Shortest paths using Dijkstra's algorithm:")
-for source in cities:
-    for target in cities:
-        if source != target:
-            shortest_path = nx.dijkstra_path(
-                graph, source=source, target=target, weight="weight"
-            )
-            path_length = nx.dijkstra_path_length(
-                graph, source=source, target=target, weight="weight"
-            )
-            print(
-                f"Shortest path from {source} to {target}: {shortest_path} with total distance {path_length} miles"
-            )
+        # Remove the current vertex from the set of unvisited vertices
+        unvisited.remove(current_vertex)
+
+    return distances
+
+
+# Graph representation with weights using a dictionary
+graph = {
+    "New York": {"Boston": 215, "Chicago": 790, "Houston": 1620, "Miami": 1280},
+    "Boston": {"New York": 215, "Chicago": 980},
+    "Chicago": {"New York": 790, "Boston": 980, "Houston": 940, "Miami": 1380},
+    "Houston": {"New York": 1620, "Chicago": 940, "Miami": 1180},
+    "Miami": {"New York": 1280, "Houston": 1180, "Chicago": 1380},
+}
+
+# Compute shortest paths between all pairs of vertices
+all_shortest_paths = {}
+for vertex in graph.keys():
+    all_shortest_paths[vertex] = dijkstra(graph, vertex)
+
+# Print the results as a table
+print("\nShortest connections between cities\n")
+print(f"{'From/To':<12} {'  '.join(graph.keys()):<50}")
+print("-" * 62)
+for start, distances in all_shortest_paths.items():
+    row = f"{start:<15} "
+    row += "  ".join(f"{distances[dest]:<5}" for dest in graph.keys())
+    print(row)

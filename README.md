@@ -55,38 +55,12 @@ Use Dijkstra's algorithm to compute the shortest path between all pairs of citie
 
 ### Results
 
-**Shortest paths using Dijkstra's algorithm:**
+### Shortest Distance Between Cities:
 
-- **From New York:**
-
-  - To Chicago: ['New York', 'Chicago'] with total distance 790 miles
-  - To Houston: ['New York', 'Houston'] with total distance 1620 miles
-  - To Miami: ['New York', 'Miami'] with total distance 1280 miles
-  - To Boston: ['New York', 'Boston'] with total distance 215 miles
-
-- **From Chicago:**
-
-  - To New York: ['Chicago', 'New York'] with total distance 790 miles
-  - To Houston: ['Chicago', 'Houston'] with total distance 940 miles
-  - To Miami: ['Chicago', 'Miami'] with total distance 1380 miles
-  - To Boston: ['Chicago', 'Boston'] with total distance 980 miles
-
-- **From Houston:**
-
-  - To New York: ['Houston', 'New York'] with total distance 1620 miles
-  - To Chicago: ['Houston', 'Chicago'] with total distance 940 miles
-  - To Miami: ['Houston', 'Miami'] with total distance 1180 miles
-  - To Boston: ['Houston', 'New York', 'Boston'] with total distance 1835 miles
-
-- **From Miami:**
-
-  - To New York: ['Miami', 'New York'] with total distance 1280 miles
-  - To Chicago: ['Miami', 'Chicago'] with total distance 1380 miles
-  - To Houston: ['Miami', 'Houston'] with total distance 1180 miles
-  - To Boston: ['Miami', 'New York', 'Boston'] with total distance 1495 miles
-
-- **From Boston:**
-  - To New York: ['Boston', 'New York'] with total distance 215 miles
-  - To Chicago: ['Boston', 'Chicago'] with total distance 980 miles
-  - To Houston: ['Boston', 'New York', 'Houston'] with total distance 1835 miles
-  - To Miami: ['Boston', 'New York', 'Miami'] with total distance 1495 miles
+| From/To      | New York | Boston | Chicago | Houston | Miami |
+| ------------ | -------- | ------ | ------- | ------- | ----- |
+| **New York** | 0        | 215    | 790     | 1620    | 1280  |
+| **Boston**   | 215      | 0      | 980     | 1920    | 1495  |
+| **Chicago**  | 790      | 980    | 0       | 940     | 1380  |
+| **Houston**  | 1620     | 1920   | 940     | 0       | 1180  |
+| **Miami**    | 1280     | 1495   | 1380    | 1180    | 0     |
